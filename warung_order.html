@@ -294,10 +294,6 @@
           <input type="text" id="inputNama" placeholder="Contoh: Budi Santoso" />
         </div>
         <div class="form-group">
-          <label>Nomor WhatsApp</label>
-          <input type="tel" id="inputWA" placeholder="Contoh: 08123456789" />
-        </div>
-        <div class="form-group">
           <label>Catatan (opsional)</label>
           <textarea id="inputCatatan" placeholder="Contoh: tidak pedas, tambah nasi, dll"></textarea>
         </div>
@@ -403,13 +399,11 @@
     }
 
     async function submitOrder() {
-      const nama     = document.getElementById("inputNama").value.trim();
-      const wa       = document.getElementById("inputWA").value.trim();
-      const catatan  = document.getElementById("inputCatatan").value.trim();
-      const items    = Object.values(cart);
+      const nama    = document.getElementById("inputNama").value.trim();
+      const catatan = document.getElementById("inputCatatan").value.trim();
+      const items   = Object.values(cart);
 
-      if (!nama)          return showToast("⚠️ Masukkan nama kamu dulu");
-      if (!wa)            return showToast("⚠️ Masukkan nomor WhatsApp");
+      if (!nama)              return showToast("⚠️ Masukkan nama kamu dulu");
       if (items.length === 0) return showToast("⚠️ Pilih menu dulu");
 
       const menuText = items.map(i => `${i.name} x${i.qty}`).join(", ");
@@ -421,7 +415,6 @@
 
       const params = new URLSearchParams({
         nama,
-        wa,
         menu: menuText,
         jumlah: items.reduce((s, i) => s + i.qty, 0),
         total,
