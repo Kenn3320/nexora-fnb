@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Warung Pak Budi — Order Online</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0f0d0b;
+      --surface:  #1a1612;
+      --surface2: #231f1a;
+      --amber:    #f59e0b;
+      --amber-dim:#7c5004;
+      --text:     #f5f0e8;
+      --muted:    #8a7d6b;
+      --border:   #2e2820;
+      --green:    #22c55e;
+      --red:      #ef4444;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── HERO ─────────────────────────────────── */
+    .hero {
+      background: var(--surface);
+      padding: 48px 24px 36px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(245,158,11,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 12px;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(28px, 6vw, 48px);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 10px;
+    }
+    .hero p {
+      color: var(--muted);
+      font-size: 14px;
+      max-width: 320px;
+      margin: 0 auto 20px;
+    }
+    .hero-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--green);
+      background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.2);
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+    .dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    /* ── LAYOUT ───────────────────────────────── */
+    .container { max-width: 480px; margin: 0 auto; padding: 0 16px; }
+
+    /* ── SECTION TITLE ────────────────────────── */
+    .section-title {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin: 32px 0 16px;
+    }
+
+    /* ── MENU ITEMS ───────────────────────────── */
+    .menu-grid { display: flex; flex-direction: column; gap: 10px; }
+
+    .menu-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: border-color 0.2s;
+      cursor: pointer;
+    }
+    .menu-item:hover { border-color: var(--amber-dim); }
+    .menu-item.selected { border-color: var(--amber); background: var(--surface2); }
+
+    .item-info { flex: 1 }
+    .item-name { font-weight: 600; font-size: 14px; margin-bottom: 3px; }
+    .item-desc { font-size: 12px; color: var(--muted); }
+    .item-price { font-weight: 700; color: var(--amber); font-size: 14px; white-space: nowrap; }
+
+    .qty-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .qty-btn {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, border-color 0.15s;
+      line-height: 1;
+    }
+    .qty-btn:hover { background: var(--amber); border-color: var(--amber); color: #000; }
+    .qty-num { font-weight: 600; font-size: 14px; min-width: 16px; text-align: center; }
+
+    /* ── ORDER FORM ───────────────────────────── */
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 8px;
+    }
+    .form-group { margin-bottom: 14px; }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus { border-color: var(--amber); }
+    .form-group textarea { resize: none; height: 72px; }
+
+    /* ── ORDER SUMMARY ────────────────────────── */
+    .summary-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+    .summary-title { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 4px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .summary-row:last-child { border: none; font-weight: 700; color: var(--amber); margin-top: 4px; }
+    .empty-order { color: var(--muted); font-size: 13px; text-align: center; padding: 8px 0; }
+
+    /* ── SUBMIT BUTTON ────────────────────────── */
+    .btn-order {
+      width: 100%;
+      padding: 14px;
+      background: var(--amber);
+      color: #000;
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      letter-spacing: 0.3px;
+    }
+    .btn-order:hover { opacity: 0.9; }
+    .btn-order:active { transform: scale(0.98); }
+    .btn-order:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── SUCCESS STATE ────────────────────────── */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 60px 24px;
+    }
+    .success-icon {
+      width: 72px; height: 72px;
+      background: rgba(34,197,94,0.1);
+      border: 2px solid var(--green);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 20px;
+    }
+    .success-screen h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    .success-screen p { color: var(--muted); font-size: 14px; }
+
+    /* ── TOAST ────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 999;
+      white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── FOOTER ───────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 32px 16px 48px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    footer span { color: var(--amber); }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <div class="hero">
+    <p class="hero-badge">Order Online</p>
+    <h1>Warung Pak Budi</h1>
+    <p>Masakan rumahan yang bikin kangen. Pesan sekarang, siap dalam 15 menit.</p>
+    <div class="hero-status">
+      <span class="dot"></span> Buka sekarang
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="mainContent">
+    <div class="container">
+
+      <!-- MENU -->
+      <p class="section-title">Menu Hari Ini</p>
+      <div class="menu-grid" id="menuGrid"></div>
+
+      <!-- ORDER FORM -->
+      <p class="section-title">Detail Pesanan</p>
+      <div class="form-card">
+
+        <!-- Summary -->
+        <div class="summary-card">
+          <p class="summary-title">Ringkasan Pesanan</p>
+          <div id="orderSummary">
+            <p class="empty-order">Belum ada item dipilih</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Nama Kamu</label>
+          <input type="text" id="inputNama" placeholder="Contoh: Budi Santoso" />
+        </div>
+        <div class="form-group">
+          <label>Nomor WhatsApp</label>
+          <input type="tel" id="inputWA" placeholder="Contoh: 08123456789" />
+        </div>
+        <div class="form-group">
+          <label>Catatan (opsional)</label>
+          <textarea id="inputCatatan" placeholder="Contoh: tidak pedas, tambah nasi, dll"></textarea>
+        </div>
+
+        <button class="btn-order" id="btnOrder" onclick="submitOrder()">
+          Kirim Pesanan via WhatsApp
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✓</div>
+    <h2>Pesanan Masuk!</h2>
+    <p>Terima kasih! Pesananmu sudah kami terima.<br>Notifikasi akan segera dikirim ke WhatsApp kamu.</p>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- FOOTER -->
+  <footer>
+    Powered by <span>Nexora Labs</span> · AI Automation
+  </footer>
+
+  <script>
+    // ─── CONFIG (GANTI INI PER CLIENT) ──────────────────────
+    const WEBHOOK_URL = "https://hook.eu1.make.com/69182otaoaey1odie6jw96nbbylyvttq";
+
+    const MENU = [
+      { id: 1, name: "Nasi Goreng Spesial",  desc: "Telur, ayam, sayur",        price: 18000 },
+      { id: 2, name: "Mie Goreng",            desc: "Ayam, bakso, sayur",        price: 15000 },
+      { id: 3, name: "Ayam Goreng",           desc: "1 potong + nasi",           price: 20000 },
+      { id: 4, name: "Soto Ayam",             desc: "Kuah bening, nasi terpisah", price: 16000 },
+      { id: 5, name: "Es Teh Manis",          desc: "Teh segar, gula aren",      price: 5000  },
+      { id: 6, name: "Es Jeruk",              desc: "Jeruk peras segar",         price: 6000  },
+    ];
+    // ────────────────────────────────────────────────────────
+
+    let cart = {};
+
+    function formatRp(n) {
+      return "Rp " + n.toLocaleString("id-ID");
+    }
+
+    function renderMenu() {
+      const grid = document.getElementById("menuGrid");
+      grid.innerHTML = MENU.map(item => `
+        <div class="menu-item ${cart[item.id]?.qty > 0 ? 'selected' : ''}" id="item-${item.id}">
+          <div class="item-info">
+            <div class="item-name">${item.name}</div>
+            <div class="item-desc">${item.desc}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="item-price">${formatRp(item.price)}</div>
+            <div class="qty-control">
+              <button class="qty-btn" onclick="updateCart(${item.id}, -1)">−</button>
+              <span class="qty-num">${cart[item.id]?.qty || 0}</span>
+              <button class="qty-btn" onclick="updateCart(${item.id}, 1)">+</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateCart(id, delta) {
+      const item = MENU.find(m => m.id === id);
+      if (!cart[id]) cart[id] = { ...item, qty: 0 };
+      cart[id].qty = Math.max(0, cart[id].qty + delta);
+      if (cart[id].qty === 0) delete cart[id];
+      renderMenu();
+      renderSummary();
+    }
+
+    function renderSummary() {
+      const el = document.getElementById("orderSummary");
+      const items = Object.values(cart);
+      if (items.length === 0) {
+        el.innerHTML = '<p class="empty-order">Belum ada item dipilih</p>';
+        return;
+      }
+      const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+      el.innerHTML = items.map(i => `
+        <div class="summary-row">
+          <span>${i.name} x${i.qty}</span>
+          <span>${formatRp(i.price * i.qty)}</span>
+        </div>
+      `).join('') + `
+        <div class="summary-row">
+          <span>Total</span>
+          <span>${formatRp(total)}</span>
+        </div>
+      `;
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 3000);
+    }
+
+    async function submitOrder() {
+      const nama     = document.getElementById("inputNama").value.trim();
+      const wa       = document.getElementById("inputWA").value.trim();
+      const catatan  = document.getElementById("inputCatatan").value.trim();
+      const items    = Object.values(cart);
+
+      if (!nama)          return showToast("⚠️ Masukkan nama kamu dulu");
+      if (!wa)            return showToast("⚠️ Masukkan nomor WhatsApp");
+      if (items.length === 0) return showToast("⚠️ Pilih menu dulu");
+
+      const menuText = items.map(i => `${i.name} x${i.qty}`).join(", ");
+      const total    = items.reduce((s, i) => s + i.price * i.qty, 0);
+
+      const btn = document.getElementById("btnOrder");
+      btn.disabled = true;
+      btn.textContent = "Mengirim pesanan...";
+
+      const params = new URLSearchParams({
+        nama,
+        wa,
+        menu: menuText,
+        jumlah: items.reduce((s, i) => s + i.qty, 0),
+        total,
+        catatan: catatan || "-"
+      });
+
+      // Image trick — bypass CORS di semua browser & mobile
+      const img = new Image();
+      img.src = `${WEBHOOK_URL}?${params}`;
+
+      setTimeout(() => {
+        document.getElementById("mainContent").style.display = "none";
+        document.getElementById("successScreen").style.display = "block";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }, 800);
+    }
+
+    renderMenu();
+  </script>
+</body>
+</html>
