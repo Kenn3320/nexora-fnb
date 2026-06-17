@@ -261,7 +261,7 @@
 
   <!-- HERO -->
   <div class="hero">
-    <p class="hero-badge">Order Online</p>
+    <p class="hero-badge" id="mejaBadge">Order Online</p>
     <h1>Warung Pak Budi</h1>
     <p>Masakan rumahan yang bikin kangen. Pesan sekarang, siap dalam 15 menit.</p>
     <div class="hero-status">
@@ -324,6 +324,12 @@
   <script>
     // ─── CONFIG (GANTI INI PER CLIENT) ──────────────────────
     const WEBHOOK_URL = "https://hook.eu1.make.com/69182otaoaey1odie6jw96nbbylyvttq";
+
+    // Auto-detect nomor meja dari URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const MEJA = urlParams.get("meja") || "Takeaway";
+    document.getElementById("mejaBadge").textContent = 
+      MEJA === "Takeaway" ? "Order Online" : `Meja ${MEJA}`;
 
     const MENU = [
       { id: 1, name: "Nasi Goreng Spesial",  desc: "Telur, ayam, sayur",        price: 18000 },
@@ -418,7 +424,8 @@
         menu: menuText,
         jumlah: items.reduce((s, i) => s + i.qty, 0),
         total,
-        catatan: catatan || "-"
+        catatan: catatan || "-",
+        meja: MEJA
       });
 
       // Image trick — bypass CORS di semua browser & mobile
