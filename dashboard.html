@@ -253,6 +253,54 @@
     .meja-orders { font-size: 20px; font-weight: 700; color: var(--blue); }
     .meja-rev { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
+    /* ── PEAK HOURS CHART ─────────────────────────── */
+    .peak-wrap {
+      padding: 20px 18px 16px;
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 160px;
+      overflow-x: auto;
+    }
+    .peak-bar-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      flex: 1;
+      min-width: 28px;
+      height: 100%;
+      position: relative;
+    }
+    .peak-count {
+      font-size: 10px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .peak-bar {
+      width: 100%;
+      max-width: 22px;
+      background: var(--s2);
+      border-radius: 4px 4px 0 0;
+      transition: background 0.2s;
+      min-height: 3px;
+    }
+    .peak-bar.peak-high { background: var(--amber); }
+    .peak-hour-label {
+      font-size: 9px;
+      color: var(--muted);
+      margin-top: 6px;
+      writing-mode: horizontal-tb;
+    }
+    .peak-badge {
+      font-size: 11px;
+      color: var(--amber);
+      background: rgba(245,158,11,0.1);
+      border: 1px solid rgba(245,158,11,0.25);
+      padding: 3px 10px;
+      border-radius: 12px;
+    }
+
     /* ── EMPTY ───────────────────────────────────── */
     .empty { padding: 32px; text-align: center; color: var(--muted); font-size: 13px; }
 
@@ -337,6 +385,17 @@
       <span class="card-title">🪑 Aktivitas Meja</span>
     </div>
     <div class="meja-grid" id="mejaGrid">
+      <div class="loading">Memuat data...</div>
+    </div>
+  </div>
+
+  <!-- PEAK HOURS -->
+  <div class="card" style="margin-top:16px">
+    <div class="card-header">
+      <span class="card-title">⏰ Jam Paling Rame</span>
+      <span class="peak-badge" id="peakBadge">—</span>
+    </div>
+    <div class="peak-wrap" id="peakChart">
       <div class="loading">Memuat data...</div>
     </div>
   </div>
@@ -484,6 +543,46 @@
             <div class="meja-rev">${formatRp(data.rev)}</div>
           </div>
         `).join('');
+    }
+
+    // Peak hours — group order berdasarkan jam (0-23)
+    const hourCounts = {};
+    orders.forEach(o => {
+      const timePart = o.waktu.split(" ")[1] || "";
+      const hour = parseInt(timePart.split(":")[0]);
+      if (!isNaN(hour)) {
+        hourCounts[hour] = (hourCounts[hour] || 0) + 1;
+      }
+    });
+
+    const pc = document.getElementById("peakChart");
+    const pb = document.getElementById("peakBadge");
+
+    if (Object.keys(hourCounts).length === 0) {
+      pc.innerHTML = '<div class="empty">Belum ada data</div>';
+      pb.textContent = "—";
+    } else {
+      const minHour = Math.min(...Object.keys(hourCounts).map(Number));
+      const maxHour = Math.max(...Object.keys(hourCounts).map(Number));
+      const maxCount = Math.max(...Object.values(hourCounts));
+
+      const peakHour = Object.entries(hourCounts).sort((a,b) => b[1]-a[1])[0][0];
+      pb.textContent = `Puncak: ${peakHour}:00`;
+
+      let bars = '';
+      for (let h = minHour; h <= maxHour; h++) {
+        const count  = hourCounts[h] || 0;
+        const height = count > 0 ? Math.max(8, Math.round((count / maxCount) * 110)) : 3;
+        const isHigh = count === maxCount && count > 0;
+        bars += `
+          <div class="peak-bar-col">
+            <div class="peak-count">${count > 0 ? count : ''}</div>
+            <div class="peak-bar ${isHigh ? 'peak-high' : ''}" style="height:${height}px"></div>
+            <div class="peak-hour-label">${h}</div>
+          </div>
+        `;
+      }
+      pc.innerHTML = bars;
     }
   }
 
