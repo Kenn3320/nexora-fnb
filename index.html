@@ -508,7 +508,7 @@
                 </div>
               </div>
             </div>
-            <form onsubmit="sendChat(event)" class="flex items-center gap-2">
+            <form id="chatForm"" class="flex items-center gap-2">
               <input id="chatInput" type="text" placeholder="Tanya soal data hari ini..." class="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-xs placeholder:text-slate-500 focus:outline-none focus:border-violet-400/40 transition">
               <button type="submit" class="w-8 h-8 shrink-0 rounded-full bg-gradient-to-br from-violet-500 to-cyan-400 flex items-center justify-center">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M3 11L21 3L13 21L11 13L3 11Z" fill="#0B0F19"/></svg>
@@ -623,4 +623,12 @@
       log.insertAdjacentHTML('beforeend', `<div class="text-red-400 text-xs mt-2">Gagal terhubung ke AI.</div>`);
     });
   }
-window.sendChat = sendChat;
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('chatForm');
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault(); // Mencegah halaman refresh
+      sendChat(e); // Memanggil fungsi sendChat
+    });
+  }
+});
