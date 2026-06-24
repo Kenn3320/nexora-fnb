@@ -623,33 +623,3 @@
       log.insertAdjacentHTML('beforeend', `<div class="text-red-400 text-xs mt-2">Gagal terhubung ke AI.</div>`);
     });
   }
-      e.preventDefault();
-      const input = document.getElementById('chatInput');
-      const text = input.value.trim();
-      if(!text) return;
-      
-      const log = document.getElementById('chatLog');
-      
-      // Tambah pesan user
-      log.insertAdjacentHTML('beforeend', `
-        <div class="flex justify-end">
-          <div class="glass-soft rounded-xl rounded-tr-sm px-3 py-2 max-w-[85%]">
-            <p class="text-xs text-slate-200">${text}</p>
-          </div>
-        </div>`);
-      input.value = '';
-      
-      // Simulasi respons
-      setTimeout(() => {
-        log.insertAdjacentHTML('beforeend', `
-          <div class="flex justify-start">
-            <div class="bg-gradient-to-br from-violet-500/15 to-cyan-400/10 border border-violet-400/15 rounded-xl rounded-tl-sm px-3 py-2 max-w-[90%]">
-              <p class="text-xs text-slate-200">Fungsi berhasil terpasang dan siap digunakan!</p>
-            </div>
-          </div>`);
-        log.scrollTop = log.scrollHeight;
-      }, 500);
-    }
-  </script>
-</body>
-</html>
