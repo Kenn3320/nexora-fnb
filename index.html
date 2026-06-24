@@ -583,14 +583,15 @@
     log.scrollTop = log.scrollHeight;
 
     // ---- DEMO ONLY ----
-   function sendChat(e) {
+   // SATU-SATUNYA FUNGSI sendChat (Ganti seluruh fungsi lama dengan ini)
+  function sendChat(e) {
     e.preventDefault();
     const input = document.getElementById('chatInput');
     const text = input.value.trim();
     if (!text) return;
     const log = document.getElementById('chatLog');
 
-    // Tampilkan pesan user
+    // 1. Tampilkan pesan user di layar
     log.insertAdjacentHTML('beforeend', `
       <div class="flex justify-end">
         <div class="glass-soft rounded-xl rounded-tr-sm px-3 py-2 max-w-[85%]">
@@ -600,7 +601,7 @@
     input.value = '';
     log.scrollTop = log.scrollHeight;
 
-    // Kirim ke Google Apps Script
+    // 2. Kirim ke Google Apps Script
     fetch("https://script.google.com/macros/s/AKfycbwIwe4k-4ynXg1lL5Xag1227-SAGqMpwkyvI3hlrqkqVP0j4AIcUtFLM786-oNwO9nW/exec", {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -608,7 +609,7 @@
     })
     .then(res => res.json())
     .then(data => {
-      // Tampilkan balasan AI
+      // 3. Tampilkan balasan AI
       log.insertAdjacentHTML('beforeend', `
         <div class="flex justify-start">
           <div class="bg-gradient-to-br from-violet-500/15 to-cyan-400/10 border border-violet-400/15 rounded-xl rounded-tl-sm px-3 py-2 max-w-[90%]">
@@ -622,8 +623,6 @@
       log.insertAdjacentHTML('beforeend', `<div class="text-red-400 text-xs mt-2">Gagal terhubung ke AI.</div>`);
     });
   }
-</div> </div> <script>
-    function sendChat(e){
       e.preventDefault();
       const input = document.getElementById('chatInput');
       const text = input.value.trim();
