@@ -623,12 +623,27 @@
       log.insertAdjacentHTML('beforeend', `<div class="text-red-400 text-xs mt-2">Gagal terhubung ke AI.</div>`);
     });
   }
+// Paksa agar sendChat bisa diakses global
+window.sendChat = sendChat; 
+
 document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('chatForm');
-  if (form) {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault(); // Mencegah halaman refresh
-      sendChat(e); // Memanggil fungsi sendChat
-    });
-  }
+    const form = document.getElementById('chatForm');
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // 1. KITA MATIKAN REFRESH DI DETIK PERTAMA
+            e.preventDefault(); 
+            e.stopPropagation(); // Menambah perlindungan agar event tidak merambat
+
+            console.log("Submit dicegat, tidak akan refresh.");
+
+            // 2. Jalankan fungsi dengan try-catch agar kalau error, 
+            // halaman tetap tidak refresh
+            try {
+                window.sendChat(e);
+            } catch (err) {
+                console.error("Ada error di fungsi sendChat:", err);
+            }
+        });
+    }
 });
