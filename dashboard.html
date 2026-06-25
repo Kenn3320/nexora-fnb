@@ -508,13 +508,12 @@
                 </div>
               </div>
             </div>
-            <!-- Cuma ada ID saja, tidak ada fungsi apa-apa di sini -->
-<form id="chatForm" class="flex items-center gap-2">
-    <input id="chatInput" type="text" ...>
-    <button type="button" id="btnKirim" class="...">
-        <svg>...</svg>
-    </button>
-</form>
+            <form onsubmit="sendChat(event)" class="flex items-center gap-2">
+              <input id="chatInput" type="text" placeholder="Tanya soal data hari ini..." class="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-xs placeholder:text-slate-500 focus:outline-none focus:border-violet-400/40 transition">
+              <button type="submit" class="w-8 h-8 shrink-0 rounded-full bg-gradient-to-br from-violet-500 to-cyan-400 flex items-center justify-center">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M3 11L21 3L13 21L11 13L3 11Z" fill="#0B0F19"/></svg>
+              </button>
+            </form>
           </div>
 
         </div>
@@ -549,12 +548,9 @@
     document.getElementById(targetId).classList.remove('hidden');
   }
 
-  // financial chatbot — demo flow only.
-  // Replace the setTimeout block below with a real fetch() call to your
-  // Apps Script Web App endpoint (see "AI Financial Analyst Chatbot" section
-  // of the implementation guide). Send Content-Type: text/plain to avoid
-  // a CORS preflight that Apps Script can't answer.
-  function formatRupiah(n){ return 'Rp ' + n.toLocaleString('id-ID'); }
+  // financial chatbot — terhubung ke Apps Script Web App asli.
+  // Ganti SCRIPT_URL ini kalau kamu deploy ulang Apps Script-nya nanti.
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwIwe4k-4ynXg1lL5Xag1227-SAGqMpwkyvI3hlrqkqVP0j4AIcUtFLM786-oNwO9nW/exec";
 
   function sendChat(e){
     e.preventDefault();
@@ -583,75 +579,33 @@
       </div>`);
     log.scrollTop = log.scrollHeight;
 
-    // ---- DEMO ONLY ----
-   // SATU-SATUNYA FUNGSI sendChat (Ganti seluruh fungsi lama dengan ini)
-  function sendChat(e) {
-    e.preventDefault();
-    const input = document.getElementById('chatInput');
-    const text = input.value.trim();
-    if (!text) return;
-    const log = document.getElementById('chatLog');
-
-    // 1. Tampilkan pesan user di layar
-    log.insertAdjacentHTML('beforeend', `
-      <div class="flex justify-end">
-        <div class="glass-soft rounded-xl rounded-tr-sm px-3 py-2 max-w-[85%]">
-          <p class="text-xs text-slate-200">${text.replace(/</g, '&lt;')}</p>
-        </div>
-      </div>`);
-    input.value = '';
-    log.scrollTop = log.scrollHeight;
-
-    // 2. Kirim ke Google Apps Script
-    fetch("https://script.google.com/macros/s/AKfycbwIwe4k-4ynXg1lL5Xag1227-SAGqMpwkyvI3hlrqkqVP0j4AIcUtFLM786-oNwO9nW/exec", {
+    fetch(SCRIPT_URL, {
       method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      headers: { "Content-Type": "text/plain;charset=utf-8" }, // wajib text/plain biar gak kena CORS preflight
       body: JSON.stringify({ action: "chat", payload: { message: text } })
     })
-    .then(res => res.json())
-    .then(data => {
-      // 3. Tampilkan balasan AI
-      log.insertAdjacentHTML('beforeend', `
-        <div class="flex justify-start">
-          <div class="bg-gradient-to-br from-violet-500/15 to-cyan-400/10 border border-violet-400/15 rounded-xl rounded-tl-sm px-3 py-2 max-w-[90%]">
-            <p class="text-xs text-slate-200 leading-relaxed">${data.reply || "AI tidak merespons."}</p>
-          </div>
-        </div>`);
-      log.scrollTop = log.scrollHeight;
-    })
-    .catch(err => {
-      console.error("Error:", err);
-      log.insertAdjacentHTML('beforeend', `<div class="text-red-400 text-xs mt-2">Gagal terhubung ke AI.</div>`);
-    });
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById(typingId)?.remove();
+        const reply = (data && data.reply) ? data.reply : "AI tidak merespons. Cek log Apps Script kamu.";
+        log.insertAdjacentHTML('beforeend', `
+          <div class="flex justify-start">
+            <div class="bg-gradient-to-br from-violet-500/15 to-cyan-400/10 border border-violet-400/15 rounded-xl rounded-tl-sm px-3 py-2 max-w-[90%]">
+              <p class="text-xs text-slate-200 leading-relaxed">${reply.replace(/</g,'&lt;')}</p>
+            </div>
+          </div>`);
+        log.scrollTop = log.scrollHeight;
+      })
+      .catch(err => {
+        document.getElementById(typingId)?.remove();
+        console.error("Chat error:", err);
+        log.insertAdjacentHTML('beforeend', `
+          <div class="flex justify-start">
+            <div class="text-rose-300 text-[11px] px-3 py-2">Gagal terhubung ke AI. Cek URL endpoint atau koneksi internet.</div>
+          </div>`);
+        log.scrollTop = log.scrollHeight;
+      });
   }
-// Paksa agar sendChat bisa diakses global
-// 1. Definisikan fungsi secara global agar bisa dipanggil
-window.kirimPesan = function() {
-    const input = document.getElementById('chatInput');
-    const text = input.value.trim();
-    if (!text) return;
-    
-    // Panggil fungsi sendChat lo di sini
-    // (Asumsikan nama fungsi asli lo adalah sendChat)
-    sendChat(text); 
-    
-    input.value = ''; // Bersihkan input
-};
-
-// 2. Pasang Listener ke Tombol
-document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('btnKirim');
-    if (btn) {
-        btn.addEventListener('click', () => {
-            window.kirimPesan();
-        });
-    }
-
-    const form = document.getElementById('chatForm');
-    if (form) {
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            window.kirimPesan();
-        });
-    }
-});
+</script>
+</body>
+</html>
