@@ -1,611 +1,620 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nexora · AI Command Center — Warung Pak Budi</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        fontFamily: {
-          sans: ['Plus Jakarta Sans', 'sans-serif'],
-          mono: ['JetBrains Mono', 'monospace'],
-        },
-      }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Owner — Warung Pak Budi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0a0a0a;
+      --surface: #111111;
+      --s2:      #1a1a1a;
+      --border:  #222222;
+      --amber:   #f59e0b;
+      --green:   #22c55e;
+      --red:     #ef4444;
+      --blue:    #3b82f6;
+      --text:    #f0f0f0;
+      --muted:   #666;
     }
-  }
-</script>
-<style>
-  :root{
-    --base:#0B0F19;
-    --violet:#8B5CF6;
-    --cyan:#22D3EE;
-    --amber:#FBBF24;
-    --rose:#FB7185;
-    --emerald:#34D399;
-  }
-  *{ scroll-behavior:smooth; }
-  body{ background:var(--base); }
 
-  /* ambient background glow blobs */
-  .bg-glow-1{
-    position:fixed; top:-10%; left:-10%; width:42rem; height:42rem;
-    background:radial-gradient(circle, rgba(139,92,246,0.16), transparent 70%);
-    filter:blur(10px); pointer-events:none; z-index:0;
-  }
-  .bg-glow-2{
-    position:fixed; bottom:-15%; right:-10%; width:46rem; height:46rem;
-    background:radial-gradient(circle, rgba(34,211,238,0.10), transparent 70%);
-    filter:blur(10px); pointer-events:none; z-index:0;
-  }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+    }
 
-  .glass{
-    background:linear-gradient(135deg, rgba(255,255,255,0.055), rgba(255,255,255,0.015));
-    border:1px solid rgba(255,255,255,0.08);
-    backdrop-filter:blur(18px);
-    -webkit-backdrop-filter:blur(18px);
-  }
-  .glass-soft{
-    background:rgba(255,255,255,0.03);
-    border:1px solid rgba(255,255,255,0.06);
-  }
+    /* ── HEADER ─────────────────────────────────── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 99;
+    }
+    .header-left h1 {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .header-left p {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--green);
+      background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.2);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+    .dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .refresh-btn {
+      background: var(--s2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .refresh-btn:hover { color: var(--text); }
 
-  .glow-violet{ box-shadow:0 0 0 1px rgba(139,92,246,0.15), 0 8px 30px -10px rgba(139,92,246,0.35); }
-  .glow-cyan{ box-shadow:0 0 0 1px rgba(34,211,238,0.15), 0 8px 30px -10px rgba(34,211,238,0.30); }
-  .glow-amber{ box-shadow:0 0 0 1px rgba(251,191,36,0.15), 0 8px 30px -10px rgba(251,191,36,0.25); }
+    /* ── MAIN ────────────────────────────────────── */
+    main { padding: 24px; max-width: 1200px; margin: 0 auto; }
 
-  .scrollbar-thin::-webkit-scrollbar{ width:6px; }
-  .scrollbar-thin::-webkit-scrollbar-track{ background:transparent; }
-  .scrollbar-thin::-webkit-scrollbar-thumb{ background:rgba(255,255,255,0.12); border-radius:10px; }
+    /* ── DATE TABS ───────────────────────────────── */
+    .date-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .tab {
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+    .tab.active {
+      background: var(--amber);
+      color: #000;
+      border-color: var(--amber);
+      font-weight: 600;
+    }
 
-  @keyframes pulseDot{
-    0%,100%{ opacity:1; transform:scale(1); }
-    50%{ opacity:0.4; transform:scale(0.8); }
-  }
-  .pulse-dot{ animation:pulseDot 1.6s ease-in-out infinite; }
+    /* ── STATS GRID ──────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+    }
+    .stat-label {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .stat-value.amber { color: var(--amber); }
+    .stat-value.green { color: var(--green); }
+    .stat-value.blue  { color: var(--blue); }
+    .stat-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
 
-  @keyframes breathe{
-    0%,100%{ opacity:0.55; transform:scale(1); }
-    50%{ opacity:1; transform:scale(1.06); }
-  }
-  .ai-orb{ animation:breathe 3.2s ease-in-out infinite; }
+    /* ── GRID LAYOUT ─────────────────────────────── */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
 
-  @keyframes typingBlink{
-    0%,80%,100%{ transform:translateY(0); opacity:0.35; }
-    40%{ transform:translateY(-3px); opacity:1; }
-  }
-  .typing-dot{ animation:typingBlink 1.1s infinite; }
-  .typing-dot:nth-child(2){ animation-delay:0.15s; }
-  .typing-dot:nth-child(3){ animation-delay:0.3s; }
+    /* ── CARDS ───────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+    .card-count {
+      font-size: 11px;
+      color: var(--muted);
+      background: var(--s2);
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
 
-  @media (prefers-reduced-motion: reduce){
-    .pulse-dot, .ai-orb, .typing-dot{ animation:none !important; }
-  }
+    /* ── ORDER LIST ──────────────────────────────── */
+    .order-list { max-height: 360px; overflow-y: auto; }
+    .order-item {
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      transition: background 0.15s;
+    }
+    .order-item:hover { background: var(--s2); }
+    .order-item:last-child { border-bottom: none; }
+    .order-nama { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+    .order-menu { font-size: 11px; color: var(--muted); line-height: 1.5; }
+    .order-right { text-align: right; flex-shrink: 0; }
+    .order-total { font-size: 13px; font-weight: 700; color: var(--amber); }
+    .order-time  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .order-meja  {
+      display: inline-block;
+      font-size: 10px;
+      background: rgba(59,130,246,0.15);
+      color: var(--blue);
+      border: 1px solid rgba(59,130,246,0.3);
+      padding: 1px 6px;
+      border-radius: 4px;
+      margin-top: 3px;
+    }
 
-  .tab-btn.active{
-    background:rgba(139,92,246,0.18);
-    border-color:rgba(139,92,246,0.4);
-    color:#E9E3FF;
-  }
-  .filter-btn.active{
-    background:rgba(255,255,255,0.10);
-    border-color:rgba(255,255,255,0.18);
-    color:#fff;
-  }
-</style>
+    /* ── BEST SELLER ─────────────────────────────── */
+    .menu-list { padding: 4px 0; }
+    .menu-row {
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .menu-row:last-child { border: none; }
+    .menu-rank {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--s2);
+      font-size: 11px;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .menu-rank.gold   { background: rgba(245,158,11,0.15); color: var(--amber); }
+    .menu-rank.silver { background: rgba(148,163,184,0.15); color: #94a3b8; }
+    .menu-rank.bronze { background: rgba(180,83,9,0.15); color: #b45309; }
+    .menu-name { flex: 1; font-size: 13px; }
+    .menu-bar-wrap { width: 80px; height: 4px; background: var(--s2); border-radius: 2px; }
+    .menu-bar { height: 4px; background: var(--amber); border-radius: 2px; }
+    .menu-count { font-size: 12px; font-weight: 600; color: var(--amber); min-width: 30px; text-align: right; }
+
+    /* ── MEJA TABLE ──────────────────────────────── */
+    .meja-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 8px;
+      padding: 16px;
+    }
+    .meja-card {
+      background: var(--s2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+    }
+    .meja-num { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .meja-orders { font-size: 20px; font-weight: 700; color: var(--blue); }
+    .meja-rev { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* ── PEAK HOURS CHART ─────────────────────────── */
+    .peak-wrap {
+      padding: 20px 18px 16px;
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 160px;
+      overflow-x: auto;
+    }
+    .peak-bar-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      flex: 1;
+      min-width: 28px;
+      height: 100%;
+      position: relative;
+    }
+    .peak-count {
+      font-size: 10px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .peak-bar {
+      width: 100%;
+      max-width: 22px;
+      background: var(--s2);
+      border-radius: 4px 4px 0 0;
+      transition: background 0.2s;
+      min-height: 3px;
+    }
+    .peak-bar.peak-high { background: var(--amber); }
+    .peak-hour-label {
+      font-size: 9px;
+      color: var(--muted);
+      margin-top: 6px;
+      writing-mode: horizontal-tb;
+    }
+    .peak-badge {
+      font-size: 11px;
+      color: var(--amber);
+      background: rgba(245,158,11,0.1);
+      border: 1px solid rgba(245,158,11,0.25);
+      padding: 3px 10px;
+      border-radius: 12px;
+    }
+
+    /* ── EMPTY ───────────────────────────────────── */
+    .empty { padding: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+
+    /* ── LOADING ─────────────────────────────────── */
+    .loading { padding: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+
+    /* ── LAST UPDATE ─────────────────────────────── */
+    #lastUpdate { font-size: 11px; color: var(--muted); }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  </style>
 </head>
-<body class="font-sans text-slate-100 min-h-screen relative">
+<body>
 
-  <div class="bg-glow-1"></div>
-  <div class="bg-glow-2"></div>
+<header>
+  <div class="header-left">
+    <h1>📊 Dashboard Owner</h1>
+    <p>Warung Pak Budi · Real-time</p>
+  </div>
+  <div class="header-right">
+    <span id="lastUpdate"></span>
+    <div class="live-badge"><span class="dot"></span> Live</div>
+    <button class="refresh-btn" onclick="loadData()">↻ Refresh</button>
+  </div>
+</header>
 
-  <div class="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+<main>
+  <!-- DATE TABS -->
+  <div class="date-tabs" id="dateTabs"></div>
 
-    <!-- ============ HEADER ============ -->
-    <header class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-7">
-      <div class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-xl glass glow-violet flex items-center justify-center">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#A78BFA" stroke-width="1.6" stroke-linejoin="round"/>
-            <path d="M2 17L12 22L22 17" stroke="#22D3EE" stroke-width="1.6" stroke-linejoin="round"/>
-            <path d="M2 12L12 17L22 12" stroke="#A78BFA" stroke-width="1.6" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div>
-          <h1 class="text-lg font-bold tracking-tight leading-none">Nexora <span class="text-slate-400 font-medium">/ AI Command Center</span></h1>
-          <p class="text-xs text-slate-500 mt-1 font-mono">Warung Pak Budi · Level 3 Operating System</p>
-        </div>
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Order</div>
+      <div class="stat-value blue" id="statOrders">—</div>
+      <div class="stat-sub" id="statOrdersSub">hari ini</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Pendapatan</div>
+      <div class="stat-value amber" id="statRevenue">—</div>
+      <div class="stat-sub" id="statRevenueSub">hari ini</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Item Terjual</div>
+      <div class="stat-value green" id="statItems">—</div>
+      <div class="stat-sub">porsi hari ini</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Rata-rata Order</div>
+      <div class="stat-value" id="statAvg">—</div>
+      <div class="stat-sub">per transaksi</div>
+    </div>
+  </div>
+
+  <!-- ORDER LIST + BEST SELLER -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Order Masuk</span>
+        <span class="card-count" id="orderCount">0 order</span>
       </div>
-
-      <div class="flex flex-wrap items-center gap-3">
-        <!-- date filter pills -->
-        <div class="flex items-center gap-1.5 glass-soft rounded-full p-1">
-          <button onclick="setFilter(this)" class="filter-btn active text-xs font-medium px-3.5 py-1.5 rounded-full border border-transparent text-slate-300 transition">Hari Ini</button>
-          <button onclick="setFilter(this)" class="filter-btn text-xs font-medium px-3.5 py-1.5 rounded-full border border-transparent text-slate-400 transition">7 Hari</button>
-          <button onclick="setFilter(this)" class="filter-btn text-xs font-medium px-3.5 py-1.5 rounded-full border border-transparent text-slate-400 transition">30 Hari</button>
-          <button onclick="setFilter(this)" class="filter-btn text-xs font-medium px-3.5 py-1.5 rounded-full border border-transparent text-slate-400 transition">Kustom</button>
-        </div>
-
-        <div class="flex items-center gap-2 glass-soft rounded-full px-3.5 py-1.5">
-          <span class="relative flex h-2 w-2">
-            <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 pulse-dot"></span>
-          </span>
-          <span class="text-xs font-medium text-slate-300">Sistem Online</span>
-          <span id="liveClock" class="text-xs font-mono text-slate-500">--:--:--</span>
-        </div>
-      </div>
-    </header>
-
-    <!-- ============ MAIN BENTO GRID ============ -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-
-      <!-- KPI ROW -->
-      <div class="col-span-12 grid grid-cols-2 lg:grid-cols-4 gap-5">
-
-        <div class="glass rounded-2xl p-5">
-          <div class="flex items-center justify-between mb-3">
-            <span class="text-xs text-slate-400 font-medium">Total Order</span>
-            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-400/10 text-emerald-400">▲ 12%</span>
-          </div>
-          <p class="text-3xl font-mono font-semibold tracking-tight">87</p>
-          <p class="text-[11px] text-slate-500 mt-1">vs. 78 kemarin</p>
-        </div>
-
-        <div class="glass rounded-2xl p-5 glow-amber">
-          <div class="flex items-center justify-between mb-3">
-            <span class="text-xs text-slate-400 font-medium">Pendapatan</span>
-            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-400/10 text-emerald-400">▲ 8.4%</span>
-          </div>
-          <p class="text-3xl font-mono font-semibold tracking-tight text-amber-300">Rp 3.845.000</p>
-          <p class="text-[11px] text-slate-500 mt-1">vs. Rp 3.548.000 kemarin</p>
-        </div>
-
-        <div class="glass rounded-2xl p-5">
-          <div class="flex items-center justify-between mb-3">
-            <span class="text-xs text-slate-400 font-medium">Item Terjual</span>
-            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-400/10 text-emerald-400">▲ 15%</span>
-          </div>
-          <p class="text-3xl font-mono font-semibold tracking-tight">215</p>
-          <p class="text-[11px] text-slate-500 mt-1">vs. 187 kemarin</p>
-        </div>
-
-        <div class="glass rounded-2xl p-5">
-          <div class="flex items-center justify-between mb-3">
-            <span class="text-xs text-slate-400 font-medium">Avg. Order Value</span>
-            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-rose-400/10 text-rose-400">▼ 2.1%</span>
-          </div>
-          <p class="text-3xl font-mono font-semibold tracking-tight">Rp 44.195</p>
-          <p class="text-[11px] text-slate-500 mt-1">vs. Rp 45.155 kemarin</p>
-        </div>
-      </div>
-
-      <!-- LEFT MAIN COLUMN -->
-      <div class="col-span-12 lg:col-span-8 flex flex-col gap-5">
-
-        <!-- Order Feed -->
-        <div class="glass rounded-2xl p-5">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-sm font-semibold text-slate-200">Live Order Feed</h2>
-            <span class="flex items-center gap-1.5 text-[10px] font-mono text-rose-300 bg-rose-400/10 px-2 py-1 rounded-full">
-              <span class="w-1.5 h-1.5 rounded-full bg-rose-400 pulse-dot"></span> LIVE
-            </span>
-          </div>
-          <div class="space-y-2 max-h-[260px] overflow-y-auto scrollbar-thin pr-1">
-            <!-- order row template -->
-            <div class="flex items-center justify-between glass-soft rounded-xl px-4 py-3">
-              <div class="flex items-center gap-3 min-w-0">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500/30 to-cyan-400/20 flex items-center justify-center text-[11px] font-semibold text-violet-200 shrink-0">BS</div>
-                <div class="min-w-0">
-                  <p class="text-sm font-medium truncate">Budi Santoso</p>
-                  <p class="text-xs text-slate-500 truncate">Nasi Goreng Spesial x2, Es Teh Manis x2</p>
-                </div>
-              </div>
-              <div class="text-right shrink-0 ml-3">
-                <p class="text-sm font-mono text-amber-300">Rp 90.000</p>
-                <p class="text-[11px] font-mono text-slate-500">14:32</p>
-              </div>
-            </div>
-
-            <div class="flex items-center justify-between glass-soft rounded-xl px-4 py-3">
-              <div class="flex items-center gap-3 min-w-0">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500/30 to-cyan-400/20 flex items-center justify-center text-[11px] font-semibold text-violet-200 shrink-0">SA</div>
-                <div class="min-w-0">
-                  <p class="text-sm font-medium truncate">Siti Aminah</p>
-                  <p class="text-xs text-slate-500 truncate">Ayam Goreng x3, Nasi Putih x3</p>
-                </div>
-              </div>
-              <div class="text-right shrink-0 ml-3">
-                <p class="text-sm font-mono text-amber-300">Rp 105.000</p>
-                <p class="text-[11px] font-mono text-slate-500">14:28</p>
-              </div>
-            </div>
-
-            <div class="flex items-center justify-between glass-soft rounded-xl px-4 py-3">
-              <div class="flex items-center gap-3 min-w-0">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500/30 to-cyan-400/20 flex items-center justify-center text-[11px] font-semibold text-violet-200 shrink-0">AW</div>
-                <div class="min-w-0">
-                  <p class="text-sm font-medium truncate">Andi Wijaya</p>
-                  <p class="text-xs text-slate-500 truncate">Mie Goreng x1, Sate Ayam x2</p>
-                </div>
-              </div>
-              <div class="text-right shrink-0 ml-3">
-                <p class="text-sm font-mono text-amber-300">Rp 78.000</p>
-                <p class="text-[11px] font-mono text-slate-500">14:21</p>
-              </div>
-            </div>
-
-            <div class="flex items-center justify-between glass-soft rounded-xl px-4 py-3">
-              <div class="flex items-center gap-3 min-w-0">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500/30 to-cyan-400/20 flex items-center justify-center text-[11px] font-semibold text-violet-200 shrink-0">DL</div>
-                <div class="min-w-0">
-                  <p class="text-sm font-medium truncate">Dewi Lestari</p>
-                  <p class="text-xs text-slate-500 truncate">Soto Ayam x2</p>
-                </div>
-              </div>
-              <div class="text-right shrink-0 ml-3">
-                <p class="text-sm font-mono text-amber-300">Rp 50.000</p>
-                <p class="text-[11px] font-mono text-slate-500">14:15</p>
-              </div>
-            </div>
-
-            <div class="flex items-center justify-between glass-soft rounded-xl px-4 py-3">
-              <div class="flex items-center gap-3 min-w-0">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500/30 to-cyan-400/20 flex items-center justify-center text-[11px] font-semibold text-violet-200 shrink-0">RH</div>
-                <div class="min-w-0">
-                  <p class="text-sm font-medium truncate">Rudi Hartono</p>
-                  <p class="text-xs text-slate-500 truncate">Nasi Goreng Spesial x1, Kerupuk x1</p>
-                </div>
-              </div>
-              <div class="text-right shrink-0 ml-3">
-                <p class="text-sm font-mono text-amber-300">Rp 33.000</p>
-                <p class="text-[11px] font-mono text-slate-500">14:09</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Menu Terlaris + Aktivitas Meja -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-          <div class="glass rounded-2xl p-5">
-            <h2 class="text-sm font-semibold text-slate-200 mb-4">Menu Terlaris</h2>
-            <div class="space-y-3.5">
-              <div>
-                <div class="flex justify-between text-xs mb-1.5">
-                  <span class="text-slate-300">Nasi Goreng Spesial</span>
-                  <span class="font-mono text-slate-400">142</span>
-                </div>
-                <div class="h-1.5 rounded-full bg-white/5 overflow-hidden">
-                  <div class="h-full rounded-full bg-gradient-to-r from-violet-500 to-cyan-400" style="width:100%"></div>
-                </div>
-              </div>
-              <div>
-                <div class="flex justify-between text-xs mb-1.5">
-                  <span class="text-slate-300">Ayam Goreng</span>
-                  <span class="font-mono text-slate-400">98</span>
-                </div>
-                <div class="h-1.5 rounded-full bg-white/5 overflow-hidden">
-                  <div class="h-full rounded-full bg-gradient-to-r from-violet-500 to-cyan-400" style="width:69%"></div>
-                </div>
-              </div>
-              <div>
-                <div class="flex justify-between text-xs mb-1.5">
-                  <span class="text-slate-300">Mie Goreng</span>
-                  <span class="font-mono text-slate-400">76</span>
-                </div>
-                <div class="h-1.5 rounded-full bg-white/5 overflow-hidden">
-                  <div class="h-full rounded-full bg-gradient-to-r from-violet-500 to-cyan-400" style="width:54%"></div>
-                </div>
-              </div>
-              <div>
-                <div class="flex justify-between text-xs mb-1.5">
-                  <span class="text-slate-300">Sate Ayam</span>
-                  <span class="font-mono text-slate-400">61</span>
-                </div>
-                <div class="h-1.5 rounded-full bg-white/5 overflow-hidden">
-                  <div class="h-full rounded-full bg-gradient-to-r from-violet-500 to-cyan-400" style="width:43%"></div>
-                </div>
-              </div>
-              <div>
-                <div class="flex justify-between text-xs mb-1.5">
-                  <span class="text-slate-300">Soto Ayam</span>
-                  <span class="font-mono text-slate-400">45</span>
-                </div>
-                <div class="h-1.5 rounded-full bg-white/5 overflow-hidden">
-                  <div class="h-full rounded-full bg-gradient-to-r from-violet-500 to-cyan-400" style="width:32%"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="glass rounded-2xl p-5">
-            <h2 class="text-sm font-semibold text-slate-200 mb-4">Aktivitas Meja</h2>
-            <div class="grid grid-cols-4 gap-2.5">
-              <div class="rounded-xl glow-amber border border-amber-400/30 bg-amber-400/10 p-2.5 text-center">
-                <p class="text-xs font-semibold">M1</p>
-                <p class="text-[10px] text-amber-300 mt-0.5">Terisi</p>
-              </div>
-              <div class="rounded-xl border border-dashed border-white/10 p-2.5 text-center">
-                <p class="text-xs font-semibold text-slate-400">M2</p>
-                <p class="text-[10px] text-slate-500 mt-0.5">Kosong</p>
-              </div>
-              <div class="rounded-xl glow-amber border border-amber-400/30 bg-amber-400/10 p-2.5 text-center">
-                <p class="text-xs font-semibold">M3</p>
-                <p class="text-[10px] text-amber-300 mt-0.5">Terisi</p>
-              </div>
-              <div class="rounded-xl glow-violet border border-violet-400/30 bg-violet-400/10 p-2.5 text-center">
-                <p class="text-xs font-semibold">M4</p>
-                <p class="text-[10px] text-violet-300 mt-0.5">Reservasi</p>
-              </div>
-              <div class="rounded-xl glow-amber border border-amber-400/30 bg-amber-400/10 p-2.5 text-center">
-                <p class="text-xs font-semibold">M5</p>
-                <p class="text-[10px] text-amber-300 mt-0.5">Terisi</p>
-              </div>
-              <div class="rounded-xl border border-dashed border-white/10 p-2.5 text-center">
-                <p class="text-xs font-semibold text-slate-400">M6</p>
-                <p class="text-[10px] text-slate-500 mt-0.5">Kosong</p>
-              </div>
-              <div class="rounded-xl glow-amber border border-amber-400/30 bg-amber-400/10 p-2.5 text-center">
-                <p class="text-xs font-semibold">M7</p>
-                <p class="text-[10px] text-amber-300 mt-0.5">Terisi</p>
-              </div>
-              <div class="rounded-xl border border-dashed border-white/10 p-2.5 text-center">
-                <p class="text-xs font-semibold text-slate-400">M8</p>
-                <p class="text-[10px] text-slate-500 mt-0.5">Kosong</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Peak hours chart -->
-        <div class="glass rounded-2xl p-5">
-          <div class="flex items-center justify-between mb-2">
-            <h2 class="text-sm font-semibold text-slate-200">Jam Paling Rame</h2>
-            <span class="text-[11px] font-mono text-slate-500">10:00 — 21:00</span>
-          </div>
-          <svg viewBox="0 0 760 220" class="w-full h-[200px]">
-            <defs>
-              <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#8B5CF6"/>
-                <stop offset="100%" stop-color="#22D3EE"/>
-              </linearGradient>
-              <linearGradient id="barGradientPeak" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#FBBF24"/>
-                <stop offset="100%" stop-color="#F59E0B"/>
-              </linearGradient>
-            </defs>
-
-            <!-- AI annotation: peak 1 -->
-            <circle cx="166" cy="14" r="3" fill="#FBBF24"/>
-            <text x="174" y="18" font-size="10" fill="#FBBF24" font-family="JetBrains Mono">AI: siapkan stok ekstra</text>
-            <line x1="166" y1="18" x2="166" y2="20" stroke="#FBBF24" stroke-width="1"/>
-
-            <!-- bars -->
-            <rect x="20"  y="146.5" width="46" height="23.5"  rx="6" fill="url(#barGradient)"/>
-            <rect x="82"  y="105.3" width="46" height="64.7"  rx="6" fill="url(#barGradient)"/>
-            <rect x="144" y="20"    width="46" height="150"   rx="6" fill="url(#barGradientPeak)"/>
-            <rect x="206" y="58.2"  width="46" height="111.8" rx="6" fill="url(#barGradient)"/>
-            <rect x="268" y="114.1" width="46" height="55.9"  rx="6" fill="url(#barGradient)"/>
-            <rect x="330" y="134.7" width="46" height="35.3"  rx="6" fill="url(#barGradient)"/>
-            <rect x="392" y="143.5" width="46" height="26.5"  rx="6" fill="url(#barGradient)"/>
-            <rect x="454" y="128.8" width="46" height="41.2"  rx="6" fill="url(#barGradient)"/>
-            <rect x="516" y="72.9"  width="46" height="97.1"  rx="6" fill="url(#barGradient)"/>
-            <rect x="578" y="49.4"  width="46" height="120.6" rx="6" fill="url(#barGradientPeak)"/>
-            <rect x="640" y="96.5"  width="46" height="73.5"  rx="6" fill="url(#barGradient)"/>
-            <rect x="702" y="137.6" width="46" height="32.4"  rx="6" fill="url(#barGradient)"/>
-
-            <!-- baseline -->
-            <line x1="10" y1="170" x2="750" y2="170" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-
-            <!-- x labels -->
-            <text x="43"  y="188" font-size="10" fill="#64748B" font-family="JetBrains Mono" text-anchor="middle">10</text>
-            <text x="105" y="188" font-size="10" fill="#64748B" font-family="JetBrains Mono" text-anchor="middle">11</text>
-            <text x="167" y="188" font-size="10" fill="#FBBF24" font-family="JetBrains Mono" text-anchor="middle">12</text>
-            <text x="229" y="188" font-size="10" fill="#64748B" font-family="JetBrains Mono" text-anchor="middle">13</text>
-            <text x="291" y="188" font-size="10" fill="#64748B" font-family="JetBrains Mono" text-anchor="middle">14</text>
-            <text x="353" y="188" font-size="10" fill="#64748B" font-family="JetBrains Mono" text-anchor="middle">15</text>
-            <text x="415" y="188" font-size="10" fill="#64748B" font-family="JetBrains Mono" text-anchor="middle">16</text>
-            <text x="477" y="188" font-size="10" fill="#64748B" font-family="JetBrains Mono" text-anchor="middle">17</text>
-            <text x="539" y="188" font-size="10" fill="#64748B" font-family="JetBrains Mono" text-anchor="middle">18</text>
-            <text x="601" y="188" font-size="10" fill="#FBBF24" font-family="JetBrains Mono" text-anchor="middle">19</text>
-            <text x="663" y="188" font-size="10" fill="#64748B" font-family="JetBrains Mono" text-anchor="middle">20</text>
-            <text x="725" y="188" font-size="10" fill="#64748B" font-family="JetBrains Mono" text-anchor="middle">21</text>
-          </svg>
-        </div>
-      </div>
-
-      <!-- ============ RIGHT: AI INSIGHTS PANEL ============ -->
-      <div class="col-span-12 lg:col-span-4">
-        <div class="glass rounded-2xl p-5 lg:sticky lg:top-6 flex flex-col gap-6 relative overflow-hidden">
-
-          <!-- ambient orb -->
-          <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-violet-500/20 blur-3xl ai-orb pointer-events-none"></div>
-
-          <div class="flex items-center gap-2.5 relative z-10">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-cyan-400 flex items-center justify-center">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="white"/></svg>
-            </div>
-            <div>
-              <h2 class="text-sm font-bold leading-none">AI Insights</h2>
-              <p class="text-[10px] text-slate-500 font-mono mt-0.5">claude-sonnet-4-6 · live</p>
-            </div>
-          </div>
-
-          <!-- 1. Stock forecast -->
-          <div class="relative z-10">
-            <div class="flex items-center justify-between mb-3">
-              <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Prediksi Stok</h3>
-              <span class="text-[10px] font-mono text-rose-300 bg-rose-400/10 px-2 py-0.5 rounded-full">1 Kritis</span>
-            </div>
-            <div class="space-y-2.5">
-              <div class="glass-soft rounded-xl p-3">
-                <div class="flex justify-between items-center mb-1.5">
-                  <span class="text-xs font-medium">Ayam Potong</span>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-400/15 text-rose-300">Kritis</span>
-                </div>
-                <p class="text-[11px] text-slate-500 mb-2">Sisa 5kg · ~0.8 hari lagi</p>
-                <div class="h-1 rounded-full bg-white/5 overflow-hidden mb-2">
-                  <div class="h-full rounded-full bg-rose-400" style="width:15%"></div>
-                </div>
-                <p class="text-[11px] text-slate-400">Beli <span class="font-mono text-slate-200">18kg</span> hari ini</p>
-              </div>
-              <div class="glass-soft rounded-xl p-3">
-                <div class="flex justify-between items-center mb-1.5">
-                  <span class="text-xs font-medium">Beras</span>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-400/15 text-amber-300">Sedang</span>
-                </div>
-                <p class="text-[11px] text-slate-500 mb-2">Sisa 12kg · ~1.5 hari lagi</p>
-                <div class="h-1 rounded-full bg-white/5 overflow-hidden mb-2">
-                  <div class="h-full rounded-full bg-amber-400" style="width:35%"></div>
-                </div>
-                <p class="text-[11px] text-slate-400">Beli <span class="font-mono text-slate-200">25kg</span> besok pagi</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="h-px bg-white/8 relative z-10"></div>
-
-          <!-- 2. Marketing agent -->
-          <div class="relative z-10">
-            <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide mb-3">Agen Marketing AI</h3>
-            <div class="glass-soft rounded-xl p-3.5 mb-3">
-              <p class="text-[10px] text-slate-500 mb-1.5 font-mono">DRAF WHATSAPP BLAST</p>
-              <p class="text-xs text-slate-200 leading-relaxed">"Halo Kak! 👋 Lagi laper siang ini? Nasi Goreng Spesial favorit semua orang lagi ready nih di Warung Pak Budi 🔥 Yuk mampir sebelum kehabisan, jam makan siang suka rame banget! 😋"</p>
-            </div>
-
-            <div class="flex gap-1.5 mb-3">
-              <button onclick="setTab(this,'igCasual')" class="tab-btn active text-[11px] px-2.5 py-1 rounded-full border border-white/10 transition">Santai</button>
-              <button onclick="setTab(this,'igFomo')" class="tab-btn text-[11px] px-2.5 py-1 rounded-full border border-white/10 text-slate-400 transition">FOMO</button>
-              <button onclick="setTab(this,'igStory')" class="tab-btn text-[11px] px-2.5 py-1 rounded-full border border-white/10 text-slate-400 transition">Story</button>
-            </div>
-
-            <div id="igCasual" class="text-xs text-slate-400 leading-relaxed mb-3">Nasi Goreng Spesial, comfort food sejuta umat 🍚🔥 Yuk cobain langsung di Warung Pak Budi. <span class="text-cyan-300">#WarungPakBudi #NasiGorengBatam</span></div>
-            <div id="igFomo" class="hidden text-xs text-slate-400 leading-relaxed mb-3">Stok Ayam Goreng makin menipis hari ini ⏳ Buruan order sebelum kehabisan! <span class="text-cyan-300">#WarungPakBudi #KuyMakan</span></div>
-            <div id="igStory" class="hidden text-xs text-slate-400 leading-relaxed mb-3">Setiap porsi Nasi Goreng Spesial dimasak fresh pas ada pesanan — itu rahasia kenapa pelanggan balik lagi. <span class="text-cyan-300">#WarungPakBudi #DapurBatam</span></div>
-
-            <button class="w-full text-xs font-semibold py-2.5 rounded-xl bg-gradient-to-r from-violet-500 to-cyan-400 text-slate-950 hover:opacity-90 transition">Setujui &amp; Kirim via WA</button>
-          </div>
-
-          <div class="h-px bg-white/8 relative z-10"></div>
-
-          <!-- 3. Financial chatbot -->
-          <div class="relative z-10 flex flex-col">
-            <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide mb-3">Tanya Analis Keuangan AI</h3>
-            <div id="chatLog" class="space-y-2.5 mb-3 max-h-[220px] overflow-y-auto scrollbar-thin pr-1">
-              <div class="flex justify-end">
-                <div class="glass-soft rounded-xl rounded-tr-sm px-3 py-2 max-w-[85%]">
-                  <p class="text-xs text-slate-200">Kenapa pendapatan hari ini turun dibanding Selasa lalu?</p>
-                </div>
-              </div>
-              <div class="flex justify-start">
-                <div class="bg-gradient-to-br from-violet-500/15 to-cyan-400/10 border border-violet-400/15 rounded-xl rounded-tl-sm px-3 py-2 max-w-[90%]">
-                  <p class="text-xs text-slate-200 leading-relaxed">Pendapatan turun Rp 480rb (-11%) dibanding Selasa lalu. Order kamu justru naik dari 79 jadi 87, tapi AOV turun dari Rp 54rb ke Rp 44rb — artinya lebih banyak pesanan menu murah. Coba bundling promo buat naikkan AOV.</p>
-                </div>
-              </div>
-            </div>
-            <form onsubmit="sendChat(event)" class="flex items-center gap-2">
-              <input id="chatInput" type="text" placeholder="Tanya soal data hari ini..." class="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-xs placeholder:text-slate-500 focus:outline-none focus:border-violet-400/40 transition">
-              <button type="submit" class="w-8 h-8 shrink-0 rounded-full bg-gradient-to-br from-violet-500 to-cyan-400 flex items-center justify-center">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M3 11L21 3L13 21L11 13L3 11Z" fill="#0B0F19"/></svg>
-              </button>
-            </form>
-          </div>
-
-        </div>
+      <div class="order-list" id="orderList">
+        <div class="loading">Memuat data...</div>
       </div>
     </div>
 
-    <footer class="text-center text-[11px] text-slate-600 mt-8 font-mono">
-      Nexora Labs · AI Operating System untuk UMKM · Powered by Claude API
-    </footer>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">🏆 Menu Terlaris</span>
+      </div>
+      <div class="menu-list" id="menuList">
+        <div class="loading">Memuat data...</div>
+      </div>
+    </div>
   </div>
 
+  <!-- MEJA ACTIVITY -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">🪑 Aktivitas Meja</span>
+    </div>
+    <div class="meja-grid" id="mejaGrid">
+      <div class="loading">Memuat data...</div>
+    </div>
+  </div>
+
+  <!-- PEAK HOURS -->
+  <div class="card" style="margin-top:16px">
+    <div class="card-header">
+      <span class="card-title">⏰ Jam Paling Rame</span>
+      <span class="peak-badge" id="peakBadge">—</span>
+    </div>
+    <div class="peak-wrap" id="peakChart">
+      <div class="loading">Memuat data...</div>
+    </div>
+  </div>
+</main>
+
 <script>
-  // live clock
-  function tick(){
-    const el = document.getElementById('liveClock');
-    if(el) el.textContent = new Date().toLocaleTimeString('id-ID');
-  }
-  tick(); setInterval(tick, 1000);
+  // ─── CONFIG ──────────────────────────────────────────────
+  const SHEET_ID  = "1bCOnPfmW-Vn8lhrY9jV2VG4X9-755zV6auD4LfcSrLc";
+  const CSV_URL   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&sheet=Sheet1`;
+  // ─────────────────────────────────────────────────────────
 
-  // date filter pills (visual only — wire to your real date-range query)
-  function setFilter(btn){
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    // TODO: refetch KPIs / order feed / charts for the selected range
+  let allOrders   = [];
+  let activeDate  = null;
+
+  function formatRp(n) {
+    return "Rp " + parseInt(n).toLocaleString("id-ID");
   }
 
-  // IG caption tabs
-  function setTab(btn, targetId){
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    ['igCasual','igFomo','igStory'].forEach(id => document.getElementById(id).classList.add('hidden'));
-    document.getElementById(targetId).classList.remove('hidden');
+  function parseCSV(text) {
+    const lines = text.trim().split("\n").slice(1); // skip header
+    return lines.map(line => {
+      const cols = [];
+      let cur = "", inQ = false;
+      for (let c of line) {
+        if (c === '"') inQ = !inQ;
+        else if (c === ',' && !inQ) { cols.push(cur.trim()); cur = ""; }
+        else cur += c;
+      }
+      cols.push(cur.trim());
+      return {
+        nama:   cols[0] || "",
+        menu:   cols[1] || "",
+        jumlah: parseInt(cols[2]) || 0,
+        total:  parseInt(cols[3]) || 0,
+        waktu:  cols[4] || "",
+        meja:   cols[5] || "Takeaway",
+        date:   (cols[4] || "").split(" ")[0] || ""
+      };
+    }).filter(o => o.nama);
   }
 
-  // financial chatbot — terhubung ke Apps Script Web App asli.
-  // Ganti SCRIPT_URL ini kalau kamu deploy ulang Apps Script-nya nanti.
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwIwe4k-4ynXg1lL5Xag1227-SAGqMpwkyvI3hlrqkqVP0j4AIcUtFLM786-oNwO9nW/exec";
+  function getDates(orders) {
+    const dates = [...new Set(orders.map(o => o.date))].sort().reverse();
+    return dates;
+  }
 
-  function sendChat(e){
-    e.preventDefault();
-    const input = document.getElementById('chatInput');
-    const text = input.value.trim();
-    if(!text) return;
-    const log = document.getElementById('chatLog');
+  function renderTabs(dates) {
+    const el = document.getElementById("dateTabs");
+    el.innerHTML = dates.map((d, i) => `
+      <div class="tab ${d === activeDate ? 'active' : ''}" onclick="setDate('${d}')">
+        ${i === 0 ? '📅 ' : ''}${d}
+      </div>
+    `).join('');
+  }
 
-    log.insertAdjacentHTML('beforeend', `
-      <div class="flex justify-end">
-        <div class="glass-soft rounded-xl rounded-tr-sm px-3 py-2 max-w-[85%]">
-          <p class="text-xs text-slate-200">${text.replace(/</g,'&lt;')}</p>
+  function setDate(date) {
+    activeDate = date;
+    renderDashboard();
+  }
+
+  function renderDashboard() {
+    const orders = allOrders.filter(o => o.date === activeDate);
+    renderTabs(getDates(allOrders));
+
+    // Stats
+    const totalRev   = orders.reduce((s, o) => s + o.total, 0);
+    const totalItems = orders.reduce((s, o) => s + o.jumlah, 0);
+    const avgOrder   = orders.length ? Math.round(totalRev / orders.length) : 0;
+
+    document.getElementById("statOrders").textContent  = orders.length;
+    document.getElementById("statRevenue").textContent = formatRp(totalRev);
+    document.getElementById("statItems").textContent   = totalItems;
+    document.getElementById("statAvg").textContent     = formatRp(avgOrder);
+    document.getElementById("orderCount").textContent  = `${orders.length} order`;
+
+    // Order list (newest first)
+    const ol = document.getElementById("orderList");
+    if (orders.length === 0) {
+      ol.innerHTML = '<div class="empty">Belum ada order hari ini</div>';
+    } else {
+      ol.innerHTML = [...orders].reverse().map(o => `
+        <div class="order-item">
+          <div class="order-left">
+            <div class="order-nama">${o.nama}</div>
+            <div class="order-menu">${o.menu}</div>
+            <span class="order-meja">${o.meja || 'Takeaway'}</span>
+          </div>
+          <div class="order-right">
+            <div class="order-total">${formatRp(o.total)}</div>
+            <div class="order-time">${o.waktu.split(" ")[1] || o.waktu}</div>
+          </div>
         </div>
-      </div>`);
-    input.value = '';
-    log.scrollTop = log.scrollHeight;
+      `).join('');
+    }
 
-    const typingId = 'typing-' + Date.now();
-    log.insertAdjacentHTML('beforeend', `
-      <div id="${typingId}" class="flex justify-start">
-        <div class="bg-gradient-to-br from-violet-500/15 to-cyan-400/10 border border-violet-400/15 rounded-xl rounded-tl-sm px-3 py-2.5 flex gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-violet-300 typing-dot"></span>
-          <span class="w-1.5 h-1.5 rounded-full bg-violet-300 typing-dot"></span>
-          <span class="w-1.5 h-1.5 rounded-full bg-violet-300 typing-dot"></span>
-        </div>
-      </div>`);
-    log.scrollTop = log.scrollHeight;
-
-    fetch(SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" }, // wajib text/plain biar gak kena CORS preflight
-      body: JSON.stringify({ action: "chat", payload: { message: text } })
-    })
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById(typingId)?.remove();
-        const reply = (data && data.reply) ? data.reply : "AI tidak merespons. Cek log Apps Script kamu.";
-        log.insertAdjacentHTML('beforeend', `
-          <div class="flex justify-start">
-            <div class="bg-gradient-to-br from-violet-500/15 to-cyan-400/10 border border-violet-400/15 rounded-xl rounded-tl-sm px-3 py-2 max-w-[90%]">
-              <p class="text-xs text-slate-200 leading-relaxed">${reply.replace(/</g,'&lt;')}</p>
-            </div>
-          </div>`);
-        log.scrollTop = log.scrollHeight;
-      })
-      .catch(err => {
-        document.getElementById(typingId)?.remove();
-        console.error("Chat error:", err);
-        log.insertAdjacentHTML('beforeend', `
-          <div class="flex justify-start">
-            <div class="text-rose-300 text-[11px] px-3 py-2">Gagal terhubung ke AI. Cek URL endpoint atau koneksi internet.</div>
-          </div>`);
-        log.scrollTop = log.scrollHeight;
+    // Best seller
+    const menuCount = {};
+    orders.forEach(o => {
+      o.menu.split(", ").forEach(item => {
+        const match = item.match(/^(.+?) x(\d+)$/);
+        if (match) {
+          const name = match[1].trim();
+          const qty  = parseInt(match[2]);
+          menuCount[name] = (menuCount[name] || 0) + qty;
+        }
       });
+    });
+    const sorted  = Object.entries(menuCount).sort((a,b) => b[1]-a[1]);
+    const maxQty  = sorted[0]?.[1] || 1;
+    const rankCls = ["gold", "silver", "bronze"];
+    const ml = document.getElementById("menuList");
+    if (sorted.length === 0) {
+      ml.innerHTML = '<div class="empty">Belum ada data</div>';
+    } else {
+      ml.innerHTML = sorted.slice(0, 6).map(([name, qty], i) => `
+        <div class="menu-row">
+          <div class="menu-rank ${rankCls[i] || ''}">${i+1}</div>
+          <div class="menu-name">${name}</div>
+          <div class="menu-bar-wrap">
+            <div class="menu-bar" style="width:${Math.round(qty/maxQty*100)}%"></div>
+          </div>
+          <div class="menu-count">${qty}x</div>
+        </div>
+      `).join('');
+    }
+
+    // Meja activity
+    const mejaData = {};
+    orders.forEach(o => {
+      const m = o.meja || "Takeaway";
+      if (!mejaData[m]) mejaData[m] = { orders: 0, rev: 0 };
+      mejaData[m].orders++;
+      mejaData[m].rev += o.total;
+    });
+    const mg = document.getElementById("mejaGrid");
+    if (Object.keys(mejaData).length === 0) {
+      mg.innerHTML = '<div class="empty">Belum ada data</div>';
+    } else {
+      mg.innerHTML = Object.entries(mejaData)
+        .sort((a,b) => b[1].orders - a[1].orders)
+        .map(([meja, data]) => `
+          <div class="meja-card">
+            <div class="meja-num">${meja}</div>
+            <div class="meja-orders">${data.orders}</div>
+            <div class="meja-rev">${formatRp(data.rev)}</div>
+          </div>
+        `).join('');
+    }
+
+    // Peak hours — group order berdasarkan jam (0-23)
+    const hourCounts = {};
+    orders.forEach(o => {
+      const timePart = o.waktu.split(" ")[1] || "";
+      const hour = parseInt(timePart.split(":")[0]);
+      if (!isNaN(hour)) {
+        hourCounts[hour] = (hourCounts[hour] || 0) + 1;
+      }
+    });
+
+    const pc = document.getElementById("peakChart");
+    const pb = document.getElementById("peakBadge");
+
+    if (Object.keys(hourCounts).length === 0) {
+      pc.innerHTML = '<div class="empty">Belum ada data</div>';
+      pb.textContent = "—";
+    } else {
+      const minHour = Math.min(...Object.keys(hourCounts).map(Number));
+      const maxHour = Math.max(...Object.keys(hourCounts).map(Number));
+      const maxCount = Math.max(...Object.values(hourCounts));
+
+      const peakHour = Object.entries(hourCounts).sort((a,b) => b[1]-a[1])[0][0];
+      pb.textContent = `Puncak: ${peakHour}:00`;
+
+      let bars = '';
+      for (let h = minHour; h <= maxHour; h++) {
+        const count  = hourCounts[h] || 0;
+        const height = count > 0 ? Math.max(8, Math.round((count / maxCount) * 110)) : 3;
+        const isHigh = count === maxCount && count > 0;
+        bars += `
+          <div class="peak-bar-col">
+            <div class="peak-count">${count > 0 ? count : ''}</div>
+            <div class="peak-bar ${isHigh ? 'peak-high' : ''}" style="height:${height}px"></div>
+            <div class="peak-hour-label">${h}</div>
+          </div>
+        `;
+      }
+      pc.innerHTML = bars;
+    }
   }
+
+  async function loadData() {
+    try {
+      const res  = await fetch(CSV_URL + "&t=" + Date.now());
+      const text = await res.text();
+      allOrders  = parseCSV(text);
+
+      const dates = getDates(allOrders);
+      if (!activeDate || !dates.includes(activeDate)) {
+        activeDate = dates[0] || null;
+      }
+
+      if (activeDate) renderDashboard();
+      else {
+        document.getElementById("orderList").innerHTML = '<div class="empty">Belum ada data order</div>';
+      }
+
+      document.getElementById("lastUpdate").textContent =
+        "Update: " + new Date().toLocaleTimeString("id-ID");
+
+    } catch (err) {
+      console.error(err);
+      document.getElementById("orderList").innerHTML =
+        '<div class="empty">❌ Gagal load data</div>';
+    }
+  }
+
+  // Load awal + auto refresh tiap 30 detik
+  loadData();
+  setInterval(loadData, 30000);
 </script>
 </body>
 </html>
